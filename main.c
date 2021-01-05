@@ -148,6 +148,7 @@ int main(int argc, char *argv[])
 
 
     mvprintw(13,0,"Please enter a message: ");
+    refresh();
     bzero(buffer,256);
     fgets(buffer, 255, stdin);
 
