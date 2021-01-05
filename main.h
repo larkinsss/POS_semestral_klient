@@ -112,9 +112,32 @@ const Position playerPos[4][2][4] = {
         }
 };
 
-int movePrintSpacing(Position p, const char* str);
-int getColor(enum Player p);
+/**
+ * Prints given string at the given position using curses.h
+ * Automatically adds spacing to the x-axis
+ * @param position where should the string be printed
+ * @param string what should be printed
+ * @return upon successful completion, returns OK. Otherwise, returns ERR
+ */
+int movePrintSpacing(Position position, const char* string);
+
+/**
+ * Gives color pair number for the given player.
+ * @param player
+ * @return color pair number
+ */
+int getColor(enum Player player);
+
+/**
+ * Gives color pair number for the given player.
+ * @param player number of the player [0 -> 3]
+ * @return color pair number
+ */
 int colorFromPlayerNum(int player);
-void draw();
+
+/**
+ * Draws the initial game board.
+ */
+void drawBoard();
 
 #endif //POS_SEMESTRAL_KLIENT_MAIN_H

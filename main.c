@@ -12,7 +12,6 @@
 int main(int argc, char *argv[])
 {
     Data gameData;
-
     int sockfd, n;
     struct sockaddr_in serv_addr;
     struct hostent* server;
@@ -57,7 +56,7 @@ int main(int argc, char *argv[])
     Data data = {0};
     n = read(sockfd, &data, sizeof(Data));
     if (n > 0) {
-        draw();
+        drawBoard();
     }
 
 
@@ -86,7 +85,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void draw()
+void drawBoard()
 {
     initscr();
 
@@ -128,14 +127,14 @@ void draw()
     refresh();
 }
 
-int movePrintSpacing(Position p, const char* str)
+int movePrintSpacing(Position position, const char* string)
 {
-    mvprintw(p.y, p.x * SPACING, str);
+    return mvprintw(position.y, position.x * SPACING, string);
 }
 
-int getColor(enum Player p)
+int getColor(enum Player player)
 {
-    return (int) p + 1;
+    return (int) player + 1;
 }
 
 int colorFromPlayerNum(int player)
