@@ -125,49 +125,6 @@ void draw()
         attroff(COLOR_PAIR(colorFromPlayerNum(player)));
     }
 
-    /*attron(COLOR_PAIR(1));
-    mvprintw(0,0,"1");
-    mvprintw(0,2,"2");
-    mvprintw(1,0,"3");
-    mvprintw(1,2,"4");
-    mvprintw(5,2,"_");
-    mvprintw(5,4,"_");
-    mvprintw(5,6,"_");
-    mvprintw(5,8,"_");
-    attroff(COLOR_PAIR(1));
-
-    attron(COLOR_PAIR(2));
-    mvprintw(0,18,"1");
-    mvprintw(0,20,"2");
-    mvprintw(1,18,"3");
-    mvprintw(1,20,"4");
-    mvprintw(1,10,"|");
-    mvprintw(2,10,"|");
-    mvprintw(3,10,"|");
-    mvprintw(4,10,"|");
-    attroff(COLOR_PAIR(2));
-
-    attron(COLOR_PAIR(3));
-    mvprintw(9,0,"1");
-    mvprintw(9,2,"2");
-    mvprintw(10,0,"3");
-    mvprintw(10,2,"4");
-    mvprintw(6,10,"|");
-    mvprintw(7,10,"|");
-    mvprintw(8,10,"|");
-    mvprintw(9,10,"|");
-    attroff(COLOR_PAIR(3));
-
-    attron(COLOR_PAIR(4));
-    mvprintw(9,18,"1");
-    mvprintw(9,20,"2");
-    mvprintw(10,18,"3");
-    mvprintw(10,20,"4");
-    mvprintw(5,12,"_");
-    mvprintw(5,14,"_");
-    mvprintw(5,16,"_");
-    mvprintw(5,18,"_");
-    attroff(COLOR_PAIR(4));*/
     refresh();
 }
 
