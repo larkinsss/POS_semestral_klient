@@ -6,98 +6,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdbool.h>
 #include <curses.h>
-
-typedef struct coordinates{
-    int surA;
-    int surB;
-} SUR;
-
-typedef struct{
-    struct coordinates coords;
-    int traveled;
-    bool active;
-} PAWN;
-
-typedef struct data {
-    PAWN playerOne[4];
-    PAWN playerTwo[4];
-    PAWN playerThree[4];
-    PAWN playerFour[4];
-} DATA;
-
-void draw()
-{
-    initscr();
-    start_color();
-
-    init_pair(1,COLOR_YELLOW, COLOR_BLACK);
-    init_pair(2,COLOR_GREEN, COLOR_BLACK);
-    init_pair(3,COLOR_BLUE, COLOR_BLACK);
-    init_pair(4,COLOR_RED, COLOR_BLACK);
-
-    printw("A A     . . .     B B\n"
-           "A A     . | .     B B\n"
-           "        . | .        \n"
-           "        . | .        \n"
-           ". . . . . | . . . . .\n"
-           ". - - - -   - - - - .\n"
-           ". . . . . | . . . . .\n"
-           "        . | .        \n"
-           "        . | .        \n"
-           "D D     . | .     C C\n"
-           "D D     . . .     C C\n");
-
-    attron(COLOR_PAIR(1));
-    mvprintw(0,0,"1");
-    mvprintw(0,2,"2");
-    mvprintw(1,0,"3");
-    mvprintw(1,2,"4");
-    mvprintw(5,2,"_");
-    mvprintw(5,4,"_");
-    mvprintw(5,6,"_");
-    mvprintw(5,8,"_");
-    attroff(COLOR_PAIR(1));
-
-    attron(COLOR_PAIR(2));
-    mvprintw(0,18,"1");
-    mvprintw(0,20,"2");
-    mvprintw(1,18,"3");
-    mvprintw(1,20,"4");
-    mvprintw(1,10,"|");
-    mvprintw(2,10,"|");
-    mvprintw(3,10,"|");
-    mvprintw(4,10,"|");
-    attroff(COLOR_PAIR(2));
-
-    attron(COLOR_PAIR(3));
-    mvprintw(9,0,"1");
-    mvprintw(9,2,"2");
-    mvprintw(10,0,"3");
-    mvprintw(10,2,"4");
-    mvprintw(6,10,"|");
-    mvprintw(7,10,"|");
-    mvprintw(8,10,"|");
-    mvprintw(9,10,"|");
-    attroff(COLOR_PAIR(3));
-
-    attron(COLOR_PAIR(4));
-    mvprintw(9,18,"1");
-    mvprintw(9,20,"2");
-    mvprintw(10,18,"3");
-    mvprintw(10,20,"4");
-    mvprintw(5,12,"_");
-    mvprintw(5,14,"_");
-    mvprintw(5,16,"_");
-    mvprintw(5,18,"_");
-    attroff(COLOR_PAIR(4));
-    refresh();
-}
+#include "main.h"
 
 int main(int argc, char *argv[])
 {
-    DATA gameData;
+    Data gameData;
 
     int sockfd, n;
     struct sockaddr_in serv_addr;
@@ -140,8 +54,8 @@ int main(int argc, char *argv[])
         return 4;
     }
 
-    DATA data = {0};
-    n = read(sockfd, &data, sizeof(DATA));
+    Data data = {0};
+    n = read(sockfd, &data, sizeof(Data));
     if (n > 0) {
         draw();
     }
@@ -170,4 +84,104 @@ int main(int argc, char *argv[])
     close(sockfd);
 
     return 0;
+}
+
+void draw()
+{
+    initscr();
+
+    start_color();
+    init_pair(1,COLOR_YELLOW, COLOR_BLACK);
+    init_pair(2,COLOR_GREEN, COLOR_BLACK);
+    init_pair(3,COLOR_BLUE, COLOR_BLACK);
+    init_pair(4,COLOR_RED, COLOR_BLACK);
+
+    printw("        . . .        \n"
+           "        .   .        \n"
+           "        .   .        \n"
+           "        .   .        \n"
+           ". . . . .   . . . . .\n"
+           ".                   .\n"
+           ". . . . .   . . . . .\n"
+           "        .   .        \n"
+           "        .   .        \n"
+           "        .   .        \n"
+           "        . . .        \n");
+
+    for (int player = 0; player < MAX_PLAYER_COUNT; ++player)
+    {
+        attron(COLOR_PAIR(colorFromPlayerNum(player)));
+
+        // Printout pawns
+        movePrintSpacing(playerPos[player][0][0], "1");
+        movePrintSpacing(playerPos[player][0][1], "2");
+        movePrintSpacing(playerPos[player][0][2], "3");
+        movePrintSpacing(playerPos[player][0][3], "4");
+
+        // Printout finish tiles
+        for (int tile = 0; tile < PAWN_COUNT; ++tile) {
+            movePrintSpacing(playerPos[player][1][tile], (const char *) (player % 2 == 0 ? "-" : "|"));
+        }
+        attroff(COLOR_PAIR(colorFromPlayerNum(player)));
+    }
+
+    /*attron(COLOR_PAIR(1));
+    mvprintw(0,0,"1");
+    mvprintw(0,2,"2");
+    mvprintw(1,0,"3");
+    mvprintw(1,2,"4");
+    mvprintw(5,2,"_");
+    mvprintw(5,4,"_");
+    mvprintw(5,6,"_");
+    mvprintw(5,8,"_");
+    attroff(COLOR_PAIR(1));
+
+    attron(COLOR_PAIR(2));
+    mvprintw(0,18,"1");
+    mvprintw(0,20,"2");
+    mvprintw(1,18,"3");
+    mvprintw(1,20,"4");
+    mvprintw(1,10,"|");
+    mvprintw(2,10,"|");
+    mvprintw(3,10,"|");
+    mvprintw(4,10,"|");
+    attroff(COLOR_PAIR(2));
+
+    attron(COLOR_PAIR(3));
+    mvprintw(9,0,"1");
+    mvprintw(9,2,"2");
+    mvprintw(10,0,"3");
+    mvprintw(10,2,"4");
+    mvprintw(6,10,"|");
+    mvprintw(7,10,"|");
+    mvprintw(8,10,"|");
+    mvprintw(9,10,"|");
+    attroff(COLOR_PAIR(3));
+
+    attron(COLOR_PAIR(4));
+    mvprintw(9,18,"1");
+    mvprintw(9,20,"2");
+    mvprintw(10,18,"3");
+    mvprintw(10,20,"4");
+    mvprintw(5,12,"_");
+    mvprintw(5,14,"_");
+    mvprintw(5,16,"_");
+    mvprintw(5,18,"_");
+    attroff(COLOR_PAIR(4));*/
+    refresh();
+}
+
+int movePrintSpacing(Position p, const char* str)
+{
+    mvprintw(p.y, p.x * SPACING, str);
+}
+
+int getColor(enum Player p)
+{
+    return (int) p + 1;
+}
+
+int colorFromPlayerNum(int player)
+{
+    return player + 1;
 }
