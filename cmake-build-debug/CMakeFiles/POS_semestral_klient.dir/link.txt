@@ -1,0 +1,1 @@
+/usr/bin/cc  -g   CMakeFiles/POS_semestral_klient.dir/main.c.o  -o POS_semestral_klient 
