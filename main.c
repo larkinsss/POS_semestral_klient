@@ -81,6 +81,7 @@ int main(int argc, char *argv[])
                 n = write(sockfd, &data, sizeof(GAME_DATA));
                 if (n < 0)
                 {
+                    printw("Toto som zmenil");
                     perror("Error writing to socket");
                     return 5;
                 }
