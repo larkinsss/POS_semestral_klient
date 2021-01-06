@@ -53,10 +53,39 @@ int main(int argc, char *argv[])
         return 4;
     }
 
-    Data data = {0};
-    n = read(sockfd, &data, sizeof(Data));
-    if (n > 0) {
-        drawBoard();
+    initscr();
+
+    start_color();
+    init_pair(1,COLOR_YELLOW, COLOR_BLACK);
+    init_pair(2,COLOR_GREEN, COLOR_BLACK);
+    init_pair(3,COLOR_BLUE, COLOR_BLACK);
+    init_pair(4,COLOR_RED, COLOR_BLACK);
+    drawBoard();
+    /*
+     * SEM PRIDE FUNKCIONALITA HRY
+     */
+
+    GAME_DATA data;
+
+    int reading;
+    while (!data.endGame) {
+        sleep(2);
+        reading = read(sockfd, &data, sizeof(GAME_DATA));
+        if (reading < 0 ) {
+            perror("Error reading from socket");
+        } else {
+            redrawBoard(data);
+            if (data.whosTurn == data.playerId) {
+                mvprintw(15,0,"YOUR TURN>>");
+                //TODO show options and let players select
+                n = write(sockfd, &data, sizeof(GAME_DATA));
+                if (n < 0)
+                {
+                    perror("Error writing to socket");
+                    return 5;
+                }
+            }
+        }
     }
 
 
@@ -81,6 +110,11 @@ int main(int argc, char *argv[])
     }
 
     printf("%s\n",buffer);
+
+
+    /*
+     * TU KONCI FUNKCIONALITA A ZATVARA SA SOCKET
+     */
     close(sockfd);
 
     return 0;
@@ -88,14 +122,6 @@ int main(int argc, char *argv[])
 
 void drawBoard()
 {
-    initscr();
-
-    start_color();
-    init_pair(1,COLOR_YELLOW, COLOR_BLACK);
-    init_pair(2,COLOR_GREEN, COLOR_BLACK);
-    init_pair(3,COLOR_BLUE, COLOR_BLACK);
-    init_pair(4,COLOR_RED, COLOR_BLACK);
-
     printw("        . . .        \n"
            "        .   .        \n"
            "        .   .        \n"
@@ -126,6 +152,28 @@ void drawBoard()
     }
 
     refresh();
+}
+
+void redrawBoard(GAME_DATA data) {
+
+    for (int player = 0; player < data.numberOfPlayers; ++player)
+    {
+        attron(COLOR_PAIR(colorFromPlayerNum(player)));
+
+        // Printout pawns
+        mvprintw(15,0,"Writing to pos: %d|%d", data.playerData.players[player][0].pos.x, data.playerData.players[player][0].pos.y);
+        movePrintSpacing(data.playerData.players[player][0].pos, "1");
+        mvprintw(16,0,"Writing to pos: %d|%d", data.playerData.players[player][1].pos.x, data.playerData.players[player][1].pos.y);
+        movePrintSpacing(data.playerData.players[player][1].pos, "2");
+        mvprintw(17,0,"Writing to pos: %d|%d", data.playerData.players[player][2].pos.x, data.playerData.players[player][2].pos.y);
+        movePrintSpacing(data.playerData.players[player][2].pos, "3");
+        mvprintw(18,0,"Writing to pos: %d|%d", data.playerData.players[player][3].pos.x, data.playerData.players[player][3].pos.y);
+        movePrintSpacing(data.playerData.players[player][3].pos, "4");
+
+        refresh();
+        attroff(COLOR_PAIR(colorFromPlayerNum(player)));
+
+    }
 }
 
 int movePrintSpacing(Position position, const char* string)
