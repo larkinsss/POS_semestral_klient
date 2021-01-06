@@ -8,10 +8,16 @@
 #include <stdbool.h>
 
 enum Player { PLAYER_1, PLAYER_2, PLAYER_3, PLAYER_4 };
+enum Command { START_GAME, END_GAME, DICE_ROLL, SKIP_TURN, AVAILABLE_PAWNS, SELECTED_PAWN };
 const int MAX_PLAYER_COUNT = 4;
 const int PAWN_COUNT = 4;
 const int SPACING = 2;
 const int SIZE = 11;
+
+typedef struct {
+    enum Command code;
+    size_t size;
+} Descriptor;
 
 /**
  * Stores the y, x coordinates
