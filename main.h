@@ -40,11 +40,10 @@ typedef struct playerData {
 } Data;
 
 typedef struct gameData {
-    Data playerData;
+    Data *playerData;
     int playerId;
     volatile bool endGame;
     int whosTurn;
-    char *option;
     int numberOfPlayers;
 } GAME_DATA;
 

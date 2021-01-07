@@ -66,7 +66,6 @@ int main(int argc, char *argv[])
      */
 
     GAME_DATA data;
-
     int reading;
     while (!data.endGame) {
         sleep(2);
@@ -81,7 +80,6 @@ int main(int argc, char *argv[])
                 n = write(sockfd, &data, sizeof(GAME_DATA));
                 if (n < 0)
                 {
-                    printw("Toto som zmenil");
                     perror("Error writing to socket");
                     return 5;
                 }
@@ -162,14 +160,14 @@ void redrawBoard(GAME_DATA data) {
         attron(COLOR_PAIR(colorFromPlayerNum(player)));
 
         // Printout pawns
-        mvprintw(15,0,"Writing to pos: %d|%d", data.playerData.players[player][0].pos.x, data.playerData.players[player][0].pos.y);
-        movePrintSpacing(data.playerData.players[player][0].pos, "1");
-        mvprintw(16,0,"Writing to pos: %d|%d", data.playerData.players[player][1].pos.x, data.playerData.players[player][1].pos.y);
-        movePrintSpacing(data.playerData.players[player][1].pos, "2");
-        mvprintw(17,0,"Writing to pos: %d|%d", data.playerData.players[player][2].pos.x, data.playerData.players[player][2].pos.y);
-        movePrintSpacing(data.playerData.players[player][2].pos, "3");
-        mvprintw(18,0,"Writing to pos: %d|%d", data.playerData.players[player][3].pos.x, data.playerData.players[player][3].pos.y);
-        movePrintSpacing(data.playerData.players[player][3].pos, "4");
+        mvprintw(15,0,"Writing to pos: %d|%d", data.playerData->players[player][0].pos.x, data.playerData->players[player][0].pos.y);
+        movePrintSpacing(data.playerData->players[player][0].pos, "1");
+        mvprintw(16,0,"Writing to pos: %d|%d", data.playerData->players[player][1].pos.x, data.playerData->players[player][1].pos.y);
+        movePrintSpacing(data.playerData->players[player][1].pos, "2");
+        mvprintw(17,0,"Writing to pos: %d|%d", data.playerData->players[player][2].pos.x, data.playerData->players[player][2].pos.y);
+        movePrintSpacing(data.playerData->players[player][2].pos, "3");
+        mvprintw(18,0,"Writing to pos: %d|%d", data.playerData->players[player][3].pos.x, data.playerData->players[player][3].pos.y);
+        movePrintSpacing(data.playerData->players[player][3].pos, "4");
 
         refresh();
         attroff(COLOR_PAIR(colorFromPlayerNum(player)));
