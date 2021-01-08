@@ -13,6 +13,7 @@ const int MAX_PLAYER_COUNT = 4;
 const int PAWN_COUNT = 4;
 const int SPACING = 2;
 const int SIZE = 11;
+const int GAME_TILE_COUNT = 40;
 
 typedef struct {
     enum Command code;
@@ -41,9 +42,17 @@ typedef struct gamepawn {
 /**
  * Game Data
  */
-typedef struct gamedata {
-    Pawn player[4][4];
+typedef struct playerData {
+    Pawn players[4][4];
 } Data;
+
+typedef struct gameData {
+    Data *playerData;
+    int playerId;
+    volatile bool endGame;
+    int whosTurn;
+    int numberOfPlayers;
+} GAME_DATA;
 
 /**
  * Coordinates for each tile in the active game area.
@@ -93,9 +102,9 @@ const Position gameArea[40] = {
 };
 
 /**
- * Coordinates for each player area in the game for all players.
+ * Coordinates for each players area in the game for all players.
  * [playerIndex][areaIndex][tileIndex]
- * \playerIndex index of a player 0 -> 3
+ * \playerIndex index of a players 0 -> 3
  * \areaIndex index of an area 0 -> 1 where 0 is startingArea and 1 is Home or ending area
  * \tileIndex index of a tile 0 -> 3, when addressing the ending area, the tile closest to the gameArea has index=0
  */
@@ -128,15 +137,15 @@ const Position playerPos[4][2][4] = {
 int movePrintSpacing(Position position, const char* string);
 
 /**
- * Gives color pair number for the given player.
+ * Gives color pair number for the given players.
  * @param player
  * @return color pair number
  */
 int getColor(enum Player player);
 
 /**
- * Gives color pair number for the given player.
- * @param player number of the player [0 -> 3]
+ * Gives color pair number for the given players.
+ * @param player number of the players [0 -> 3]
  * @return color pair number
  */
 int colorFromPlayerNum(int player);
@@ -145,5 +154,28 @@ int colorFromPlayerNum(int player);
  * Draws the initial game board.
  */
 void drawBoard();
+
+/**
+ * Draws board with changes
+ * @param data
+ */
+void redrawBoard(GAME_DATA data);
+
+/**
+ *
+ */
+void gameLogic(Descriptor descriptor, int sockfd);
+
+/**
+ * Method which handles dice roll input from server.
+ * Prints out rolled dice.
+ */
+void handleDiceRoll(Descriptor descriptor, int sockfd);
+
+void handleSkipTurn(Descriptor descriptor, int sockfd);
+
+void handlePawns(Descriptor descriptor, int sockfd);
+
+bool positionEquals(Position a, Position b);
 
 #endif //POS_SEMESTRAL_KLIENT_MAIN_H
