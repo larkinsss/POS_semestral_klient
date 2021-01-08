@@ -13,6 +13,7 @@ const int MAX_PLAYER_COUNT = 4;
 const int PAWN_COUNT = 4;
 const int SPACING = 2;
 const int SIZE = 11;
+const int GAME_TILE_COUNT = 40;
 
 typedef struct {
     enum Command code;
@@ -154,6 +155,27 @@ int colorFromPlayerNum(int player);
  */
 void drawBoard();
 
+/**
+ * Draws board with changes
+ * @param data
+ */
 void redrawBoard(GAME_DATA data);
+
+/**
+ *
+ */
+void gameLogic(Descriptor descriptor, int sockfd);
+
+/**
+ * Method which handles dice roll input from server.
+ * Prints out rolled dice.
+ */
+void handleDiceRoll(Descriptor descriptor, int sockfd);
+
+void handleSkipTurn(Descriptor descriptor, int sockfd);
+
+void handlePawns(Descriptor descriptor, int sockfd);
+
+bool positionEquals(Position a, Position b);
 
 #endif //POS_SEMESTRAL_KLIENT_MAIN_H

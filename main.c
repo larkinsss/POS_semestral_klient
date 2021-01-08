@@ -60,56 +60,26 @@ int main(int argc, char *argv[])
     init_pair(2,COLOR_GREEN, COLOR_BLACK);
     init_pair(3,COLOR_BLUE, COLOR_BLACK);
     init_pair(4,COLOR_RED, COLOR_BLACK);
-    drawBoard();
+
     /*
      * SEM PRIDE FUNKCIONALITA HRY
      */
 
+
     GAME_DATA data;
     int reading;
-    while (!data.endGame) {
-        sleep(2);
-        reading = read(sockfd, &data, sizeof(GAME_DATA));
-        if (reading < 0 ) {
-            perror("Error reading from socket");
-        } else {
-            redrawBoard(data);
-            if (data.whosTurn == data.playerId) {
-                mvprintw(15,0,"YOUR TURN>>");
-                //TODO show options and let players select
-                n = write(sockfd, &data, sizeof(GAME_DATA));
-                if (n < 0)
-                {
-                    perror("Error writing to socket");
-                    return 5;
-                }
-            }
-        }
-    }
-
-
-    mvprintw(13,0,"Please enter a message: ");
-    refresh();
-    bzero(buffer,256);
-    fgets(buffer, 255, stdin);
-
-    n = write(sockfd, &data, strlen(buffer));
-    if (n < 0)
-    {
-        perror("Error writing to socket");
-        return 5;
-    }
-
-    bzero(buffer,256);
-    n = read(sockfd, buffer, 255);
-    if (n < 0)
-    {
+    Descriptor descriptor = {0,0};
+    //sleep(2);
+    reading = read(sockfd, &descriptor, sizeof(Descriptor));
+    if (reading < 0 ) {
         perror("Error reading from socket");
-        return 6;
     }
-
-    printf("%s\n",buffer);
-
+    if(descriptor.code == START_GAME) {
+        drawBoard();
+        gameLogic(descriptor, sockfd);
+    } else {
+        perror("Something went wrong \n");
+    }
 
     /*
      * TU KONCI FUNKCIONALITA A ZATVARA SA SOCKET
@@ -118,6 +88,97 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
+void gameLogic(Descriptor descriptor, int sockfd){
+    while (descriptor.code != END_GAME) {
+        int socMsg;
+        socMsg = read(sockfd, &descriptor, sizeof(Descriptor));
+        if (socMsg < 0 ) {
+            perror("Error reading from socket");
+        }
+
+        switch (descriptor.code) {
+            case DICE_ROLL:
+                handleDiceRoll(descriptor,sockfd);
+                break;
+            case SKIP_TURN:
+                handleSkipTurn(descriptor,sockfd);
+                break;
+            case AVAILABLE_PAWNS:
+                handlePawns(descriptor,sockfd);
+                break;
+            default:
+                perror("Descriptor method not recognized");
+                break;
+        }
+    }
+}
+
+bool positionEquals(Position a, Position b)
+{
+    return a.x == b.x && a.y == b.y;
+}
+
+void handleDiceRoll(Descriptor descriptor, int sockfd){
+    int n;
+    char buffer[255];
+    bzero(buffer,255);
+    if (descriptor.code == DICE_ROLL) {
+        n = read(sockfd, buffer, descriptor.size);
+        if (n < 0) {
+            mvprintw(13,0,"Error reading from socket on DICE_ROLL");
+        } else {
+            mvprintw(13,0,buffer);
+        }
+    } else {
+        mvprintw(13,0,"Server went wrong somewhere. Wait a while please.");
+    }
+    refresh();
+}
+
+void handleSkipTurn(Descriptor descriptor, int sockfd){
+    int n;
+    char buffer[255];
+    bzero(buffer,255);
+    if (descriptor.code == SKIP_TURN) {
+        n = read(sockfd, buffer, descriptor.size);
+        if (n < 0) {
+            mvprintw(13,0,"Error reading from socket on DICE_ROLL");
+        } else {
+            mvprintw(13,0,buffer);
+        }
+    } else {
+        mvprintw(13,0,"Server went wrong somewhere. Wait a while please.");
+    }
+    refresh();
+}
+
+void handlePawns(Descriptor descriptor, int sockfd) {
+    int n;
+    Pawn *possibleMoves = NULL;
+    if (descriptor.code == AVAILABLE_PAWNS) {
+        n = read(sockfd, possibleMoves, descriptor.size);
+        if (n < 0) {
+            mvprintw(13,0,"Error reading from socket on DICE_ROLL");
+        } else {
+            int n = (int)(descriptor.size/sizeof(Pawn));
+            for (int i = 0; i < n; ++i) {
+                mvprintw(13+i,0,"You can move pawn %c", possibleMoves[i].symbol);
+            }
+            char pawn;
+            mvprintw(12,0,"Vyber figurku ktorou chces pohnut:" );
+            scanw("%c", &pawn);
+            if (pawn >= '1' && pawn < '5') {
+                n = write(sockfd, &pawn, sizeof(char));
+            }
+        }
+    } else {
+        mvprintw(13,0,"Server went wrong somewhere. Wait a while please.");
+    }
+    refresh();
+}
+
+
 
 void drawBoard()
 {
@@ -160,13 +221,13 @@ void redrawBoard(GAME_DATA data) {
         attron(COLOR_PAIR(colorFromPlayerNum(player)));
 
         // Printout pawns
-        mvprintw(15,0,"Writing to pos: %d|%d", data.playerData->players[player][0].pos.x, data.playerData->players[player][0].pos.y);
+        //mvprintw(15,0,"Writing to pos: %d|%d", data.playerData->players[player][0].pos.x, data.playerData->players[player][0].pos.y);
         movePrintSpacing(data.playerData->players[player][0].pos, "1");
-        mvprintw(16,0,"Writing to pos: %d|%d", data.playerData->players[player][1].pos.x, data.playerData->players[player][1].pos.y);
+        //mvprintw(16,0,"Writing to pos: %d|%d", data.playerData->players[player][1].pos.x, data.playerData->players[player][1].pos.y);
         movePrintSpacing(data.playerData->players[player][1].pos, "2");
-        mvprintw(17,0,"Writing to pos: %d|%d", data.playerData->players[player][2].pos.x, data.playerData->players[player][2].pos.y);
+        //mvprintw(17,0,"Writing to pos: %d|%d", data.playerData->players[player][2].pos.x, data.playerData->players[player][2].pos.y);
         movePrintSpacing(data.playerData->players[player][2].pos, "3");
-        mvprintw(18,0,"Writing to pos: %d|%d", data.playerData->players[player][3].pos.x, data.playerData->players[player][3].pos.y);
+        //mvprintw(18,0,"Writing to pos: %d|%d", data.playerData->players[player][3].pos.x, data.playerData->players[player][3].pos.y);
         movePrintSpacing(data.playerData->players[player][3].pos, "4");
 
         refresh();
